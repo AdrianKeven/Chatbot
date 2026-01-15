@@ -2,6 +2,7 @@ package com.adriank.Chatbot.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.*;
 
@@ -17,6 +18,7 @@ public class Conversation extends BaseEntity {
     private String phoneNumber;
 
     @ManyToOne
+    @JoinColumn(name = "bot_id", nullable = false)
     private Bot bot;
 
     private boolean active;

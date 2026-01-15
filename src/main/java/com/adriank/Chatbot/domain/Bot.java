@@ -7,7 +7,8 @@ import lombok.*;
 
 @Entity
 @Getter
-@Setter@NoArgsConstructor
+@Setter
+@NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class Bot extends BaseEntity {
