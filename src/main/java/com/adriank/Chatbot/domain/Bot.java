@@ -1,9 +1,11 @@
 package com.adriank.Chatbot.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.ManyToOne;
+import com.adriank.Chatbot.integration.whatsapp.domain.BotIntent;
+import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -20,4 +22,7 @@ public class Bot extends BaseEntity {
 
     @ManyToOne
     private User owner;
+
+    @OneToMany(mappedBy = "bot", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<BotIntent> intents = new ArrayList<>();
 }

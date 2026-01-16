@@ -11,7 +11,8 @@ import lombok.*;
 @Builder
 public class Message extends BaseEntity{
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "conversation_id", nullable = false)
     private Conversation conversation;
 
     @Enumerated(EnumType.STRING)

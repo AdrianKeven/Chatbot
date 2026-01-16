@@ -13,3 +13,9 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+
+    whatsapp:
+      token: SEU_TOKEN_DA_META
+      phone-number-id: 123456789
+      verify-token: chatbot_verify
+

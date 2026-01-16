@@ -2,6 +2,7 @@ package com.adriank.Chatbot.service;
 
 import com.adriank.Chatbot.domain.Bot;
 import com.adriank.Chatbot.domain.Conversation;
+import com.adriank.Chatbot.domain.ConversationStatus;
 import com.adriank.Chatbot.dto.CreateDTO.ConversationCreateDTO;
 import com.adriank.Chatbot.dto.DefaultDTO.ConversationDTO;
 import com.adriank.Chatbot.Mapper.ConversationMapper;
@@ -48,14 +49,45 @@ public class ConversationService {
 
     public void activate(Long id) {
         Conversation conversation = findById(id);
-        conversation.setActive(true);
+        conversation.activate();
         conversationRepository.save(conversation);
+    }
+
+    public Conversation findOrCreateConversation(String phone) {
+
+        return conversationRepository
+                .findByPhoneAndStatus(phone, ConversationStatus.ACTIVE)
+                .orElseGet(() -> {
+                    Bot bot = botRepository.findDefaultBot()
+                            .orElseThrow(() -> new RuntimeException("Bot padrão não encontrado"));
+
+                    Conversation conversation = Conversation.builder()
+                            .phone(phone)
+                            .bot(bot)
+                            .status(ConversationStatus.ACTIVE)
+                            .build();
+
+                    return conversationRepository.save(conversation);
+                });
     }
 
     public void close(Long id) {
-        Conversation conversation = findById(id);
-        conversation.setActive(false);
+        Conversation conversation = conversationRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Conversation não encontrada"));
+
+        conversation.close();
         conversationRepository.save(conversation);
     }
 
+    public void receiveMessage(String phone, String message) {
+
+        Conversation conversation = findOrCreateConversation(phone);
+
+        String response = generateResponse(conversation, message);
+
+        // envia de volta ao WhatsApp
+        senderService.sendMessage(phone, response);
+    }
 }
+
+

@@ -1,10 +1,12 @@
 package com.adriank.Chatbot.service;
 
 import com.adriank.Chatbot.domain.Bot;
+import com.adriank.Chatbot.domain.Conversation;
 import com.adriank.Chatbot.domain.User;
 import com.adriank.Chatbot.dto.CreateDTO.BotCreateDTO;
 import com.adriank.Chatbot.dto.DefaultDTO.BotDTO;
 import com.adriank.Chatbot.Mapper.BotMapper;
+import com.adriank.Chatbot.integration.whatsapp.domain.BotIntent;
 import com.adriank.Chatbot.repository.BotRepository;
 import com.adriank.Chatbot.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -50,5 +52,26 @@ public class BotService {
 
     public void delete(Long id) {
         botRepository.delete(findById(id));
+    }
+
+    public String generateResponse(Conversation conversation, String message) {
+
+        String normalizedMessage = normalize(message);
+
+        return conversation.getBot().getIntents().stream()
+                .filter(intent ->
+                        intent.getKeywords().stream()
+                                .map(this::normalize)
+                                .anyMatch(normalizedMessage::contains)
+                )
+                .map(BotIntent::getResponse)
+                .findFirst()
+                .orElse("Não entendi sua pergunta.");
+    }
+
+    private String normalize(String text) {
+        return java.text.Normalizer.normalize(text, java.text.Normalizer.Form.NFD)
+                .replaceAll("\\p{M}", "")
+                .toLowerCase();
     }
 }
